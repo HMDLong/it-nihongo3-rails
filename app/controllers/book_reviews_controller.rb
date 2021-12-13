@@ -1,6 +1,5 @@
 class BookReviewsController < ApplicationController
   before_action :set_book_review, only: %i[ show edit update destroy ]
-  before_action :authenticate_user!
 
   # GET /book_reviews or /book_reviews.json
   def index
@@ -23,9 +22,11 @@ class BookReviewsController < ApplicationController
   # POST /book_reviews or /book_reviews.json
   def create
     @book_review = BookReview.new(book_review_params)
+    @book_review.user_id = current_user.id
 
     respond_to do |format|
       if @book_review.save
+        url = "/books/" + @book_review.book_id.to_s
         format.html { redirect_to @book_review, notice: "Book review was successfully created." }
         format.json { render :show, status: :created, location: @book_review }
       else
@@ -61,7 +62,6 @@ class BookReviewsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_book_review
       @book_review = BookReview.find(params[:id])
-      @book_review = current_user.id
     end
 
     # Only allow a list of trusted parameters through.
